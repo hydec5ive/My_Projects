@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boston Real Estate Analysis</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        .section {
+            padding: 4rem 0;
+        }
+        .section-title {
+            margin-bottom: 2rem;
+            font-weight: 700;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            width: 50px;
+            height: 4px;
+            background-color: #3B82F6;
+        }
+        .viz-container {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .viz-container:hover {
+            transform: translateY(-5px);
+        }
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #3B82F6;
+            transition: width 0.3s;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .stats-card {
+            transition: all 0.3s;
+        }
+        .stats-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3B82F6;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563EB;
+        }
+        .visualization-iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md fixed w-full z-10">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="#" class="text-xl font-bold text-blue-600">Boston Real Estate Analysis</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#introduction" class="nav-link text-gray-700 hover:text-blue-600">Introduction</a>
+                <a href="#data" class="nav-link text-gray-700 hover:text-blue-600">Data</a>
+                <a href="#visualizations" class="nav-link text-gray-700 hover:text-blue-600">Visualizations</a>
+                <a href="#summary" class="nav-link text-gray-700 hover:text-blue-600">Summary</a>
+            </div>
+            <button class="md:hidden focus:outline-none">
+                <svg class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="hidden md:hidden bg-white shadow-md fixed inset-x-0 z-10" style="top: 62px;">
+        <div class="container mx-auto px-6 py-3 flex flex-col space-y-4">
+            <a href="#introduction" class="text-gray-700 hover:text-blue-600">Introduction</a>
+            <a href="#data" class="text-gray-700 hover:text-blue-600">Data</a>
+            <a href="#visualizations" class="text-gray-700 hover:text-blue-600">Visualizations</a>
+            <a href="#summary" class="text-gray-700 hover:text-blue-600">Summary</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white pt-32 pb-20">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">Boston Real Estate Market Analysis</h1>
+            <p class="text-xl mb-8">Exploring property values, amenities, and neighborhood trends in Boston</p>
+            <a href="#introduction" class="bg-white text-blue-600 font-semibold px-6 py-3 rounded-full shadow-md hover:bg-gray-100 transition duration-300">Get Started</a>
+        </div>
+    </header>
+
+    <!-- Introduction Section -->
+    <section id="introduction" class="section bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold section-title">Introduction</h2>
+            <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div>
+                    <p class="text-lg text-gray-700 mb-6">
+                        Boston's real estate market presents a complex landscape influenced by historical architecture, neighborhood dynamics, and modern development trends. Our analysis examines how property values correlate with factors such as age, condition, amenities, and location.
+                    </p>
+                    <p class="text-lg text-gray-700">
+                        This study focuses on key neighborhoods including Back Bay, Beacon Hill, Downtown, Financial District, Seaport, and South End - areas known for their distinct character and varying real estate profiles. By understanding these patterns, we can identify value drivers and market trends across Boston's diverse urban fabric. Ultimately, we can help stakeholders make more informed decisions about property investments, pricing strategies, and market timing. 
+                    </p>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-6 shadow-md">
+                    <h3 class="text-xl font-semibold text-blue-600 mb-4">Key Research Questions</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                            <span>How do neighborhood characteristics and amenity styles impact property values across Boston's diverse districts, and which areas command the highest price premiums?</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                            <span>What is the relationship between physical property attributes (such as number of bedrooms, owner occupancy status, and building condition) and market valuation?</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                            <span>How have property values evolved over time across different Boston neighborhoods, and what role does property age play in determining value per square foot in various ZIP codes?</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Section -->
+    <section id="data" class="section bg-gray-50">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold section-title">Our Data</h2>
+            <div class="mt-10">
+                <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+                    <h3 class="text-xl font-semibold text-blue-600 mb-4">Data Overview</h3>
+                    <p class="text-gray-700 mb-6">
+                        Our analysis uses comprehensive Boston property assessment data, focusing on residential properties across key neighborhoods. The dataset, sourced from the <a href="https://data.boston.gov/dataset/property-assessment" class="text-blue-600 hover:underline" target="_blank">City of Boston's Property Assessment dataset</a>, includes detailed property characteristics, valuations, and location information.
+                    </p>
+                    
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="stats-card bg-blue-50 rounded-lg p-6 border-l-4 border-blue-500">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-2">Key Attributes</h4>
+                            <ul class="text-gray-700 space-y-2">
+                                <li>Property location (ZIP code, neighborhood)</li>
+                                <li>Year built and building age</li>
+                                <li>Property value metrics</li>
+                                <li>Condition assessments</li>
+                                <li>Interior amenity quality</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="stats-card bg-indigo-50 rounded-lg p-6 border-l-4 border-indigo-500">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-2">Data Processing</h4>
+                            <ul class="text-gray-700 space-y-2">
+                                <li>Categorized by year built ranges</li>
+                                <li>Aggregated by neighborhood zones</li>
+                                <li>Normalized value calculations</li>
+                                <li>Standardized condition ratings</li>
+                                <li>Missing value handling</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="stats-card bg-purple-50 rounded-lg p-6 border-l-4 border-purple-500">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-2">Analysis Focus</h4>
+                            <ul class="text-gray-700 space-y-2">
+                                <li>Cross-neighborhood comparisons</li>
+                                <li>Property age value correlations</li>
+                                <li>Luxury amenity price premiums</li>
+                                <li>Condition impact on valuation</li>
+                                <li>Value per square foot metrics</li>
+                            </ul>
+                        </div>
+                    </div>
+    
+                    <!-- References Section -->
+                    <div class="mt-8">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-2">References</h4>
+                        <ul class="text-gray-700 space-y-2">
+                            <li><a href="https://www.point2homes.com/news/us-real-estate-news/boston-zip-codes-where-home-prices-doubled-in-just-5-years.html" class="text-blue-600 hover:underline" target="_blank">Boston ZIP Codes Where Home Prices Doubled in Just 5 Years</a> - Point2Homes</li>
+                            <li><a href="https://www.tbf.org/news-and-insights/reports/2023/november/2023-greater-boston-housing-report-card-charts" class="text-blue-600 hover:underline" target="_blank">2023 Greater Boston Housing Report Card Charts</a> - The Boston Foundation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Visualizations Section -->
+    <section id="visualizations" class="section bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold section-title">Visualizations</h2>
+
+            <!-- Visualization 1 -->
+            <div class="mt-12 viz-container bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="p-6 bg-gray-50 border-b">
+                    <h3 class="text-xl font-semibold text-blue-600">Median Home Value and Property Density by Zip Code</h3>
+                    <p class="text-gray-700 mt-2">
+                        This map visualizes median home values across Boston's ZIP codes, utilizing circle sizes to represent the number of properties and colors to indicate home values, facilitating a quick visual assessment of more expensive vs. more affordable areas.
+                    </p>
+                </div>
+                <div class="p-4">
+                    <iframe class="visualization-iframe" src="boston_housing_prices_map.html"></iframe>
+                </div>
+                <div class="p-6 bg-blue-50">
+                    <h4 class="font-semibold text-blue-600 mb-2">Key Insights:</h4>
+                    <ul class="text-gray-700 space-y-2">
+                        <li>• Higher housing prices are concentrated near Boston's main economic and cultural centers</li>
+                        <li>• Areas like Brighton and Dorchester show a dense concentration of properties, indicating populous residential zones</li>
+                        <li>• The distribution of housing prices identifies potential target neighborhoods for various market segments, from luxury buyers to those seeking affordable options</li>
+                        <li>• Property values increase with closeness to key urban amenitiese</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Visualization 2 -->
+            <div class="mt-10 viz-container bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="p-6 bg-gray-50 border-b">
+                    <h3 class="text-xl font-semibold text-blue-600">Property Age vs. Average Value per Square Foot by ZIP Code</h3>
+                    <p class="text-gray-700 mt-2">
+                        This visualization shows how property values vary by construction date across different Boston neighborhoods, highlighting historical trends and neighborhood value patterns.
+                    </p>
+                </div>
+                <div class="p-4">
+                    <iframe class="visualization-iframe" src="stacked_property_age_vs_value_per_sf.html"></iframe>
+                </div>
+                <div class="p-6 bg-blue-50">
+                    <h4 class="font-semibold text-blue-600 mb-2">Key Insights:</h4>
+                    <ul class="text-gray-700 space-y-2">
+                        <li>• Back Bay shows consistently high values across most time periods</li>
+                        <li>• The Seaport district shows extremely high values for 1960s properties</li>
+                        <li>• Most neighborhoods show renewed value in properties built after 2000</li>
+                        <li>• Historical properties (pre-1900) maintain strong values in premium neighborhoods</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Visualization 3 -->
+            <div class="mt-12 viz-container bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="p-6 bg-gray-50 border-b">
+                    <h3 class="text-xl font-semibold text-blue-600">Housing Characteristics Impact Dashboard</h3>
+                    <p class="text-gray-700 mt-2">
+                        This dashboard analyzes the impact of various housing characteristics—number of bedrooms, full bathrooms, half bathrooms, and living area size—on property values across all ZIP codes in Boston.
+                    </p>
+                </div>
+                <div class="p-4">
+                    <iframe class="visualization-iframe" src="housing_impact_dashboard_with_data.html"></iframe>
+                </div>
+                <div class="p-6 bg-blue-50">
+                    <h4 class="font-semibold text-blue-600 mb-2">Key Insights:</h4>
+                    <ul class="text-gray-700 space-y-2">
+                        <li>• Bedrooms and bathrooms significantly boost property values, peaking at 14 bedrooms and 9 full bathrooms</li>
+                        <li>• Values drop sharply for properties with more than these numbers</li>
+                        <li>• Properties with up to 2 half bathrooms also experience an increase in value</li>
+                        <li>• Larger living areas correlate with dramatically higher property values, emphasizing the importance of property size in market valuation</li>
+                    </ul>
+                </div>
+            </div>           
+
+            <!-- Visualization 4 -->
+            <div class="mt-12 viz-container bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="p-6 bg-gray-50 border-b">
+                    <h3 class="text-xl font-semibold text-blue-600">Amenities and Condition Price Premium by Neighborhood</h3>
+                    <p class="text-gray-700 mt-2">
+                        This heatmap explores how property values correlate with interior amenity quality and overall condition across Boston neighborhoods.
+                    </p>
+                </div>
+                <div class="p-4">
+                    <iframe class="visualization-iframe" src="amenities_condition_price_premium.html"></iframe>
+                </div>
+                <div class="p-6 bg-blue-50">
+                    <h4 class="font-semibold text-blue-600 mb-2">Key Insights:</h4>
+                    <ul class="text-gray-700 space-y-2">
+                        <li>• Luxury kitchens command significant price premiums in Back Bay and Downtown</li>
+                        <li>• Overall condition has a stronger impact on value than specific amenities in most neighborhoods</li>
+                        <li>• The Financial District shows the highest premium for excellent condition properties</li>
+                        <li>• Amenity impact varies significantly between neighborhoods, with less impact in more affordable areas</li>
+                    </ul>
+                </div>
+            </div>          
+            
+        <!-- Visualization 5 -->
+        <div class="mt-12 viz-container bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="p-6 bg-gray-50 border-b">
+                <h3 class="text-xl font-semibold text-blue-600">Owner-Occupancy and Property Value Relationship Analysis</h3>
+                <p class="text-gray-700 mt-2">
+                    This visualization compares property values by owner-occupancy status, property view, and corner unit status, and highlights the mean total and building values by owner-occupancy, offering insights into factors influencing Boston property values.
+                </p>
+            </div>
+            <div class="p-4">
+                <!-- Adjust the iframe size as needed -->
+                <iframe class="visualization-iframe" src="vis5.html" style="width:100%; height:600px; border:none;"></iframe>
+            </div>
+            <div class="p-6 bg-blue-50">
+                <h4 class="font-semibold text-blue-600 mb-2">Key Insights:</h4>
+                <ul class="text-gray-700 space-y-2">
+                    <li>• Owner-occupancy slightly affects total value, with owner-occupied properties having a lower median but higher mean due to high-value outliers</li>
+                    <li>• Property view greatly impacts total value, with "Excellent" and "Special" views having the highest values and "Poor" the lowest</li>
+                    <li>• Corner units have a slightly higher median total value than non-corner units, with more high-value outliers</li>
+                    <li>• Owner-occupied properties show higher average total and building values than non-owner-occupied ones, but the building value difference is small</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Summary Section -->
+    <section id="summary" class="section bg-gray-50">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold section-title">Summary and Conclusions</h2>
+            <div class="mt-10 bg-white rounded-lg shadow-md p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div>
+                        <h3 class="text-xl font-semibold text-blue-600 mb-4">Key Findings</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 text-blue-500 mr-2">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
+                                <span class="text-gray-700">Property values are highest near economic and cultural centers like Back Bay and Downtown, with historical properties (pre-1900) and new constructions (post-2000) commanding premiums, while Seaport shows exceptional value for 1960s properties due to its redevelopment.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 text-blue-500 mr-2">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
+                                <span class="text-gray-700">Luxury amenities, especially kitchens, and excellent property condition drive significant price premiums in premium neighborhoods like Back Bay, Downtown, and the Financial District, though their impact diminishes in more affordable areas like Dorchester.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 text-blue-500 mr-2">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
+                                <span class="text-gray-700">Larger living areas and optimal bedroom/bathroom counts (up to 14 bedrooms and 9 full bathrooms) significantly boost property values, though values drop beyond these thresholds; corner units and excellent views further enhance valuations.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 text-blue-500 mr-2">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
+                                <span class="text-gray-700">Bigger spaces, great views, and corner units lift values; owner-occupied homes average higher due to outliers.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-blue-600 mb-4">Market Implications</h3>
+                        <p class="text-gray-700 mb-4">
+                            Boston's real estate market reveals a complex interplay of location, property characteristics, and neighborhood dynamics. High-value areas like Back Bay, Downtown, and the Financial District benefit from proximity to urban amenities, excellent condition, and luxury features, while emerging districts like Seaport capitalize on modern development trends.
+                        </p>
+                        <p class="text-gray-700 mb-4">
+                            Historical properties maintain strong value in established neighborhoods, particularly when paired with modern upgrades, whereas newer constructions dominate in rapidly evolving areas. Property size, view quality, and corner unit status further amplify value, especially in high-demand zones, though optimal configurations vary by market segment.
+                        </p>
+                        <p class="text-gray-700">
+                            These insights underscore the need for tailored investment strategies. Developers and investors should prioritize condition and amenities in premium neighborhoods, while focusing on size and modern appeal in growing districts. For homebuyers, understanding these localized value drivers is critical to navigating Boston's diverse and dynamic real estate landscape.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Future Implementation Steps Section -->
+    <section id="future-implementation" class="section bg-gray-50">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold section-title">Future Implementation Steps</h2>
+            <div class="mt-10 bg-white rounded-lg shadow-md p-8">
+                <h3 class="text-xl font-semibold text-blue-600 mb-4">Next Steps for Project Development</h3>
+                <ul class="space-y-4">
+                    <li class="flex items-start">
+                        <div class="flex-shrink-0 h-6 w-6 text-blue-500 mr-2">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </div>
+                        <span class="text-gray-700"><strong>Short-term:</strong> Seek a more detailed and clear dataset by web scraping from websites like Redfin to enhance data quality.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <div class="flex-shrink-0 h-6 w-6 text-blue-500 mr-2">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </div>
+                        <span class="text-gray-700"><strong>Short-term:</strong> Test a simple regression model on existing variables to establish a baseline for predictive accuracy.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <div class="flex-shrink-0 h-6 w-6 text-blue-500 mr-2">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </div>
+                        <span class="text-gray-700"><strong>Long-term:</strong> Develop a full predictive model using machine learning to improve forecasting capabilities.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <div class="flex-shrink-0 h-6 w-6 text-blue-500 mr-2">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </div>
+                        <span class="text-gray-700"><strong>Long-term:</strong> Partner with local stakeholders to apply insights to policy decisions and real estate strategies.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <div class="flex-shrink-0 h-6 w-6 text-blue-500 mr-2">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </div>
+                        <span class="text-gray-700"><strong>Long-term:</strong> Automate the data pipeline and deploy it as a live web app for greater efficiency and user convenience.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    <script>
+        // Mobile menu toggle
+        document.querySelector('button').addEventListener('click', function() {
+            const mobileMenu = document.querySelector('.md\\:hidden.bg-white');
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+            } else {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        // Hide mobile menu on click outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.querySelector('.md\\:hidden.bg-white');
+            const menuButton = document.querySelector('button.md\\:hidden');
+            
+            if (!mobileMenu.contains(event.target) && !menuButton.contains(event.target) && !mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        // Close mobile menu when a link is clicked
+        document.querySelectorAll('.md\\:hidden.bg-white a').forEach(link => {
+            link.addEventListener('click', function() {
+                document.querySelector('.md\\:hidden.bg-white').classList.add('hidden');
+            });
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
