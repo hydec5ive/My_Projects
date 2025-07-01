@@ -1,0 +1,18 @@
+---
+:id: 323356536
+:submitters:
+- :name: Kexin Huang
+  :email: huang.kexi@northeastern.edu
+- :name: Yuqi Chen
+  :email: chen.yuqi2@northeastern.edu
+- :name: Haoyuan Deng
+  :email: deng.haoyu@northeastern.edu
+- :name: Lin Pan
+  :email: pan.lin2@northeastern.edu
+:created_at: !ruby/object:ActiveSupport::TimeWithZone
+  utc: 2025-04-08 03:56:12.681564000 Z
+  zone: !ruby/object:ActiveSupport::TimeZone
+    name: America/Los_Angeles
+  time: 2025-04-07 20:56:12.681564000 Z
+:status: processed
+:score: 88.0
